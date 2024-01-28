@@ -2,9 +2,9 @@ import os
 import pandas as pd
 
 main_folder = "/Users/kumar/personal_finance/"
+month = "jan_2024"
 
 def read_from_kotak_csv():
-    month = "jan_2024"
     current_folder = main_folder + month + "/"
     kotak_folder = current_folder + "kotak/"
     print("kotak_folder ------> ", kotak_folder)
