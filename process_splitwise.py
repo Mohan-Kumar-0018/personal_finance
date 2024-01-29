@@ -7,7 +7,7 @@ from PIL import Image
 import numpy as np
 import pandas as pd
 
-
+row_types = ["EXPENSE_ROW","TRANSACTION_ROW"]
 main_folder = "/Users/kumar/personal_finance/"
 month = "jan_2024"
 
@@ -33,7 +33,11 @@ def get_final_image():
     images = []
     for file in files_in_folder:
         img_file = splitwise_folder + file
-        img = cv2.imread(img_file)
+        try:
+            img = cv2.imread(img_file)
+        except Exception as e:
+            print("Exception in get_final_image ------> ", e)
+            continue
         images.append(img)
     img_v_resize = vconcat_resize(images)
     
@@ -70,6 +74,51 @@ def read_from_splitwise_final_image():
             extracted_text = pytesseract.image_to_string(cv2.cvtColor(roi, cv2.COLOR_BGR2RGB), config=options).strip()
             print("extracted_text ------> ", extracted_text)
     # show_image(image_copy, "Bounding boxes")
+            
+def checking_dev():
+    print("checking_dev started ...")
+    current_folder = main_folder + month + "/temp/"
+    files_in_folder = os.listdir(current_folder)
+    files_in_folder = sorted(files_in_folder)
+    print("image files length ------> ", len(files_in_folder))
+    expense_rows = []
+    others = []
+    data = []
+    for file in files_in_folder:
+        # print("file ------> ", file)
+        try:
+            img_file = current_folder + file
+            row_date, row_month = get_date_month_from(img_file)
+            # if date and month -> Consider as spend box
+            expense_rows.append(img_file)
+            data.append({'FILE_NAME': file, 'ROW_DATE': row_date, 'ROW_MONTH': row_month, 'ROW_YEAR': '2024'})
+
+        except Exception as e:
+            others.append(file)
+            print("Exception in checking_dev ------> ", e)
+            continue
+    print("expense_rows length ------> ", len(expense_rows))
+    # print("failed ------> ", failed)
+    print("others length ------> ", len(others))
+    df = pd.DataFrame(data)
+    df['TR_DATE'] = pd.to_datetime(df['ROW_DATE'] + ' ' + df['ROW_MONTH'] + ' ' + df['ROW_YEAR'], format='%d %b %Y')
+    df['TR_DATE'] = df['TR_DATE'].dt.strftime('%d-%m-%Y')
+    print("df ------> ", df)
+
+
+
+def get_date_month_from(img_file):
+    image = cv2.imread(img_file)
+    left_image = image[:, :100]
+    # write_image(left_image, f'left_image_{file_name}')
+    rgb_image = cv2.cvtColor(left_image, cv2.COLOR_BGR2RGB)
+    options = f'-l eng --psm 6 --oem 3 -c tessedit_char_whitelist=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    extracted_text = pytesseract.image_to_string(rgb_image, config=options).strip()
+    extracted_text = extracted_text.replace('\n', ',').split(',')
+    month = extracted_text[0]
+    date = extracted_text[1]
+    print("date,month ------> ", date, month)
+    return date, month
     
 def read_from_temp_splitwise_images():
     print("read_from_temp_splitwise_images started ...")
@@ -234,13 +283,13 @@ def split_image_vertical(image, vertical_positions):
 
     return split_images
 
-
 def process_splitwise_data():
     print("process_splitwise_data started ...")
     # get_final_image()
     # split_image_to_row_images()
     # read_from_splitwise_final_image()
-    read_from_temp_splitwise_images()
+    # read_from_temp_splitwise_images()
+    checking_dev()
 
 process_splitwise_data()
 
