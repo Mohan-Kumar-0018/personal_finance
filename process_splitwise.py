@@ -5,6 +5,7 @@ from pytesseract import Output
 import matplotlib.pyplot as plt
 from PIL import Image
 import numpy as np
+import pandas as pd
 
 
 main_folder = "/Users/kumar/personal_finance/"
@@ -74,50 +75,48 @@ def read_from_temp_splitwise_images():
     print("read_from_temp_splitwise_images started ...")
     current_folder = main_folder + month + "/temp/"
     files_in_folder = os.listdir(current_folder)
+    files_in_folder = sorted(files_in_folder)
     print("temp_folder ------> ", current_folder)
     print("image files ------> ", files_in_folder)
     print("image files length ------> ", len(files_in_folder))
+    all_texts = []
     for file in files_in_folder:
         print("file ------> ", file)
         try:
             img_file = current_folder + file
             img = cv2.imread(img_file)
             rgb_image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            options = f"-l eng --psm 6"
-            extracted_text = pytesseract.image_to_string(cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB), config=options).strip()
-            print("extracted_text ------> ", extracted_text)
+            height, width, _ = img.shape
+            positions = split_number_with_custom_ratio(width, [10, 45, 25, 25])
+            positions = np.round(positions).astype(int)
+            positions = [sum(positions[:i+1]) for i in range(len(positions))]
+            # Draw vertical lines on the image
+            # image_with_lines = draw_vertical_lines(img, positions)
+            # write_image(image_with_lines, 'vertical_lines.png')
+            split_images = split_image_vertical(img, positions)
+            print("split_images length ------> ", len(split_images))
+            row_image_texts = []
+            for i, split_image in enumerate(split_images):
+                height, width, _ = split_image.shape
+                if not (height > 40 and width > 40):
+                    continue
+                # write_image(split_image, f'split_image{i}.png')
+                rgb_image = cv2.cvtColor(split_image, cv2.COLOR_BGR2RGB)
+                # options = f"-l eng --psm 6"
+                options = f'-l eng --psm 6 --oem 3 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,'
+
+                extracted_text = pytesseract.image_to_string(cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB), config=options).strip()
+                extracted_text = extracted_text.replace('\n', ' ')
+                row_image_texts.append(extracted_text)
+                print("extracted_text sub image------> ", extracted_text)
         except Exception as e:
             print("Exception in read_from_temp_splitwise_images ------> ", e)
             continue
-
-def read_from_sample_image():
-    print("read_from_sample_image started ...")
-    img_file = "/Users/kumar/personal_finance/jan_2024/temp/split_image4.png"
-    img = cv2.imread(img_file)
-    rgb_image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    options = f"-l eng --psm 6"
-    extracted_text = pytesseract.image_to_string(cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB), config=options).strip()
-    _, width ,_ = img.shape
-    print("extracted_text ------> ", extracted_text)
-    positions = split_number_with_custom_ratio(width, [10, 45, 25, 25])
-    positions = np.round(positions).astype(int)
-    positions = [sum(positions[:i+1]) for i in range(len(positions))]
-
-    print("positions ------> ", positions)
-    print("shape -->" ,img.shape)
-    # Draw vertical lines on the image
-    image_with_lines = draw_vertical_lines(img, positions)
-    write_image(image_with_lines, 'vertical_lines.png')
-
-    split_images = split_image_vertical(img, positions)
-    print("split_images length ------> ", len(split_images))
-    for i, split_image in enumerate(split_images):
-        write_image(split_image, f'split_image{i}.png')
-        rgb_image = cv2.cvtColor(split_image, cv2.COLOR_BGR2RGB)
-        options = f"-l eng --psm 6"
-        extracted_text = pytesseract.image_to_string(cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB), config=options).strip()
-        print("extracted_text sub image------> ", extracted_text)
-
+        print("row_image_texts ------> ", row_image_texts)
+        all_texts.append(row_image_texts)
+    print("all_texts ------> ", all_texts)
+    df = pd.DataFrame(all_texts, columns=['PART1', 'PART2', 'PART3', 'PART4'])
+    print("df ------> ", df)
 
 
 def split_image_to_row_images():
@@ -169,7 +168,7 @@ def split_image_to_row_images():
     print("split_images length------> ", len(split_images))
 
     for i, split_image in enumerate(split_images):
-        height, width, channels = split_image.shape
+        height, width, _ = split_image.shape
         if height > 40 and width > 500:
             write_temp_image(split_image, f'split_image{i}.png')
 
@@ -241,8 +240,7 @@ def process_splitwise_data():
     # get_final_image()
     # split_image_to_row_images()
     # read_from_splitwise_final_image()
-    # read_from_temp_splitwise_images()
-    read_from_sample_image()
+    read_from_temp_splitwise_images()
 
 process_splitwise_data()
 
