@@ -47,6 +47,7 @@ def extract_data_from_expense_boxes(expense_boxes):
         if cost_div:
             paid_by = cost_div.get_text(strip=True, separator='\n').split()[0]
             total_amount = cost_div.find('span', class_='number').get_text(strip=True)
+            total_amount = float(total_amount.replace('₹', ''))
             print("total_amount = ", total_amount)
         else:
             print("No cost div found.")
@@ -55,12 +56,13 @@ def extract_data_from_expense_boxes(expense_boxes):
             you_span_div = you_div.find_next('span')
             print("you_span_div = ", you_span_div)
             share_amount = you_span_div.get_text(strip=True)
+            share_amount = float(share_amount.replace('₹', ''))
             print("share_amount = ", share_amount)
-            # print("total_amount = ", total_amount)
-            # if paid_by == "you":
-            #     expense_amount = total_amount - share_amount
-            # else:
-            #     expense_amount = share_amount
+            print("total_amount = ", total_amount)
+            if paid_by == "you":
+                expense_amount = total_amount - share_amount
+            else:
+                expense_amount = share_amount
         else:
             print("No you div found.")    
         data.append({
@@ -70,7 +72,7 @@ def extract_data_from_expense_boxes(expense_boxes):
                 'PAID_BY': paid_by,
                 'TOTAL_AMOUNT': total_amount,
                 'SHARE_AMOUNT': share_amount,
-                # 'EXPENSE_AMOUNT': expense_amount
+                'EXPENSE_AMOUNT': expense_amount
             })
         
     return data
