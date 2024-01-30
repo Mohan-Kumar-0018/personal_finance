@@ -108,11 +108,19 @@ def extract_data_from_transaction_boxes(transaction_boxes):
         #     paid_by = cost_div.get_text().split("you").split()[0]
         # else:
         #     print("No cost div found.")
+        you_div = transaction_box.find('div', class_='you')
+        if you_div:
+            you_span_div = you_div.find_next('span')
+            total_amount = you_span_div.get_text(strip=True)
+            total_amount = float(total_amount.replace('₹', ''))
+        else:
+            print("No you div found.")
         data.append({
             'TRANSACTION_DATE': formatted_date,
             'TITLE': title,
             'PAID_BY': paid_by,
             'GROUP_NAME': group_name,
+            'TOTAL_AMOUNT': total_amount,
         })
     return data
     
