@@ -2,20 +2,23 @@ import os
 import pandas as pd
 
 main_folder = "/Users/kumar/personal_finance/"
-month = "jan_2024"
+month_folder = "jan_2024"
 
-def read_from_kotak_csv():
-    current_folder = main_folder + month + "/"
+def get_kotak_csv_file_path():
+    current_folder = main_folder + month_folder + "/"
     kotak_folder = current_folder + "kotak/"
-    print("kotak_folder ------> ", kotak_folder)
     files_in_folder = os.listdir(kotak_folder)
-    print("files_in_folder ------> ", files_in_folder)
-    file_path = kotak_folder + files_in_folder[0]
+    filtered_files_in_folder = [file for file in files_in_folder if file.endswith(".csv")]
+    file_path = kotak_folder + filtered_files_in_folder[0]
     fileExists = os.path.isfile(file_path)
     if not fileExists:
         print("KOTAK File not found")
         return
+    print("kotak file_path ->", file_path)
+    return file_path
 
+def read_from_kotak_csv():
+    file_path = get_kotak_csv_file_path()
     column_mapping = {'Sl. No.': 'S_NO', 'Transaction Date': 'DATE', 'Description': 'DESCRIPTION', 'Chq / Ref No.': 'TRANSACTION_ID', 'Amount': 'AMOUNT', 'Dr / Cr': 'TYPE', 'Balance': 'BALANCE'}
     columns = column_mapping.keys()
     data_df = pd.read_csv(file_path, skiprows=13, on_bad_lines='warn')
@@ -26,18 +29,16 @@ def read_from_kotak_csv():
     df_filtered['BALANCE'] = df_filtered['BALANCE'].str.replace(',', '').astype(float)
     print("df_filtered ------> ", df_filtered)
     credit_data = df_filtered[df_filtered['TYPE'] == 'CREDIT']
-    print("credit_data ------> ", credit_data)
+    print("credit_data ------> ")
+    print(credit_data)
     debit_data = df_filtered[df_filtered['TYPE'] == 'DEBIT']
-    print("debit_data ------> ", debit_data)
+    print("debit_data ------> ")
+    print(debit_data)
 
     total_income = credit_data['AMOUNT'].sum()
     print("total_income ------> ", total_income)
     total_expenses = debit_data['AMOUNT'].sum()
     print("total_expenses ------> ", total_expenses)
-
-    # for index, row in df_filtered.iterrows():
-    #     print("index ------> ", index)
-    #     print("row ------> ", row)
     
 
 def process_kotak_data():

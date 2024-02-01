@@ -5,24 +5,39 @@ import os
 
 # Read the HTML file
 file_path = '/Users/kumar/Downloads/splitwise_1.html'
-main_folder = "/Users/kumar/personal_finance/"
 month_year = "jan-2024"
+main_folder = "/Users/kumar/personal_finance/"
+month_folder = "jan_2024"
 
+
+def get_splitwise_html_file_path():
+    current_folder = main_folder + month_folder + "/"
+    splitwise_folder = current_folder + "splitwise/"
+    files_in_folder = os.listdir(splitwise_folder)
+    filtered_files_in_folder = [file for file in files_in_folder if file.endswith(".html")]
+    file_path = splitwise_folder + filtered_files_in_folder[0]
+    fileExists = os.path.isfile(file_path)
+    if not fileExists:
+        print("Splitwise File not found")
+        return
+    print("splitwise file_path ->", file_path)
+    return file_path
 
 def read_from_splitwise_html():
     expense_boxes, transaction_boxes, errors = extract_valid_expense_and_transaction_boxes()
     print("expense_boxes length= ", len(expense_boxes))
     print("transaction_boxes length= ", len(transaction_boxes))
     print("errors length= ", len(errors))
-    # expense_data = extract_data_from_expense_boxes(expense_boxes)
-    # expense_df = pd.DataFrame(expense_data)
-    # print("expense_df = ", expense_df)
-    # format_data_from_df(expense_df,"expense_data")
+    expense_data = extract_data_from_expense_boxes(expense_boxes)
+    expense_df = pd.DataFrame(expense_data)
+    print("expense_df = ")
+    print(expense_df)
+    format_data_from_df(expense_df,"expense_data")
     transaction_data = extract_data_from_transaction_boxes(transaction_boxes)
     transaction_df = pd.DataFrame(transaction_data)
-    print("transaction_df = ", transaction_df)
+    print("transaction_df = ")
+    print(transaction_df)
     format_data_from_df(transaction_df,"transaction_data")
-
 
 def extract_data_from_expense_boxes(expense_boxes):
     data = []
@@ -41,10 +56,10 @@ def extract_data_from_expense_boxes(expense_boxes):
                     group_name = a_tags[1].get_text(strip=True)
                 elif a_tags_length == 1:
                     title = a_tags[0].get_text(strip=True)
-                    group_name = ""
+                    group_name = "N/A"
                 else:
-                    title = ""
-                    group_name = ""
+                    title = "N/A"
+                    group_name = "N/A"
             else:
                 print("No description main-block div found.")
         else:
@@ -85,29 +100,31 @@ def extract_data_from_expense_boxes(expense_boxes):
 def extract_data_from_transaction_boxes(transaction_boxes):
     data = []
     for transaction_box in transaction_boxes:
-        # print("transaction_box = ", transaction_box)
         datetime_object = datetime.strptime(transaction_box['data-date'], "%Y-%m-%dT%H:%M:%SZ")
         formatted_date = datetime_object.strftime("%d-%m-%Y")
         main_block_div = transaction_box.find('div', class_='main-block')
         if main_block_div:
-            title = ""
             main_block_header_div = main_block_div.find('div', class_='header')
             if main_block_header_div:
                 a_tag = main_block_header_div.find_next('a')
                 full_text = a_tag.get_text().replace('\n', '').strip()
                 paid_by = full_text.split("paid")[0].strip()
-                group_name = full_text.split("in")[1].strip()
-                
-                print("full_text = ", full_text)
+                start_index = full_text.find("paid")
+                end_index = full_text.find("₹", start_index + len("paid"))
+                group_name = full_text[start_index + len("paid"):end_index]
             else:
                 print("No description main-block div found.")
         else:
             print("No main-block header div found.")
-        # cost_div = transaction_box.find('div', class_='cost')
-        # if cost_div:
-        #     paid_by = cost_div.get_text().split("you").split()[0]
-        # else:
-        #     print("No cost div found.")
+        cost_div = transaction_box.find('div', class_='cost')
+        if cost_div:
+            paid_by_text = cost_div.get_text().replace('\n', '').strip()
+            if paid_by_text == "you paid":
+                transaction_type = "DEBIT"
+            else:
+                transaction_type = "CREDIT"
+        else:
+            print("No cost div found.")
         you_div = transaction_box.find('div', class_='you')
         if you_div:
             you_span_div = you_div.find_next('span')
@@ -117,7 +134,7 @@ def extract_data_from_transaction_boxes(transaction_boxes):
             print("No you div found.")
         data.append({
             'TRANSACTION_DATE': formatted_date,
-            'TITLE': title,
+            'TRANSACTION_TYPE': transaction_type,
             'PAID_BY': paid_by,
             'GROUP_NAME': group_name,
             'TOTAL_AMOUNT': total_amount,
@@ -134,7 +151,6 @@ def extract_valid_expense_and_transaction_boxes():
         for expense_div in expense_divs:
             data_date_value = expense_div['data-date']
             datetime_object = datetime.strptime(data_date_value, "%Y-%m-%dT%H:%M:%SZ")
-            # formatted_date = datetime_object.strftime("%d-%m-%Y")
             target_dt_obj = datetime.strptime(month_year, "%b-%Y")
             if datetime_object.month != target_dt_obj.month or datetime_object.year != target_dt_obj.year:
                 continue
@@ -157,6 +173,7 @@ def extract_valid_expense_and_transaction_boxes():
     return expense_boxes, transaction_boxes, errors
 
 def get_expenses_list_table_element():
+    file_path = get_splitwise_html_file_path()
     with open(file_path, 'r', encoding='utf-8') as file:
         html_content = file.read()
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -176,7 +193,7 @@ def get_start_month(expense_div):
         return month
 
 def format_data_from_df(data_frame,file_name):
-    current_folder = main_folder + month_year + "/"
+    current_folder = main_folder + month_folder + "/"
     output_file_path = current_folder + file_name + '.csv'
     print("output_file_path = ", output_file_path)
     data_frame.to_csv(output_file_path, index=False)
