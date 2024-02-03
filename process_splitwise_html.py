@@ -60,6 +60,9 @@ def extract_data_from_expense_boxes(expense_boxes):
                 else:
                     title = "N/A"
                     group_name = "N/A"
+                if title == "Settle all balances":
+                    # Skip splitwise automated settlements
+                    continue
             else:
                 print("No description main-block div found.")
         else:
