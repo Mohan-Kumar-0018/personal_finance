@@ -3,10 +3,8 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import os
 
-# Read the HTML file
-file_path = '/Users/kumar/Downloads/splitwise_1.html'
 main_folder = "/Users/kumar/personal_finance/"
-month_folder = "jan_2024"
+month_folder = os.environ.get('YEAR_MONTH')
 
 
 def get_splitwise_html_file_path():
@@ -92,10 +90,10 @@ def extract_data_from_expense_boxes(expense_boxes):
             'TITLE': title,
             'GROUP_NAME': group_name,
             'PAID_BY': paid_by,
-            'TOTAL_AMOUNT': total_amount,
-            'SHARE_AMOUNT': share_amount,
-            'EXPENSE_AMOUNT': expense_amount,
-            "SPEND_RECEIVABLE": spend_receivable,
+            'TOTAL_AMOUNT': round(total_amount,2),
+            'SHARE_AMOUNT': round(share_amount,2),
+            'EXPENSE_AMOUNT': round(expense_amount,2),
+            "SPEND_RECEIVABLE": round(spend_receivable,2),
         })
         
     return data
