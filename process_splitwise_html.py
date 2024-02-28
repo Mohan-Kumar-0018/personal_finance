@@ -5,7 +5,6 @@ import os
 
 # Read the HTML file
 file_path = '/Users/kumar/Downloads/splitwise_1.html'
-month_year = "jan-2024"
 main_folder = "/Users/kumar/personal_finance/"
 month_folder = "jan_2024"
 
@@ -14,7 +13,7 @@ def get_splitwise_html_file_path():
     current_folder = main_folder + month_folder + "/"
     splitwise_folder = current_folder + "splitwise/"
     files_in_folder = os.listdir(splitwise_folder)
-    filtered_files_in_folder = [file for file in files_in_folder if file.endswith(".html")]
+    filtered_files_in_folder = [file for file in files_in_folder if file.endswith("splitwise.html")]
     file_path = splitwise_folder + filtered_files_in_folder[0]
     fileExists = os.path.isfile(file_path)
     if not fileExists:
@@ -32,12 +31,13 @@ def read_from_splitwise_html():
     expense_df = pd.DataFrame(expense_data)
     print("expense_df = ")
     print(expense_df)
-    format_data_from_df(expense_df,"expense_data")
+    save_splitwise_csv(expense_df,"expense_data")
+    print("TOTAL EXPENSES = ", expense_df['EXPENSE_AMOUNT'].sum())
     transaction_data = extract_data_from_transaction_boxes(transaction_boxes)
     transaction_df = pd.DataFrame(transaction_data)
     print("transaction_df = ")
     print(transaction_df)
-    format_data_from_df(transaction_df,"transaction_data")
+    save_splitwise_csv(transaction_df,"transaction_data")
 
 def extract_data_from_expense_boxes(expense_boxes):
     data = []
@@ -154,7 +154,7 @@ def extract_valid_expense_and_transaction_boxes():
         for expense_div in expense_divs:
             data_date_value = expense_div['data-date']
             datetime_object = datetime.strptime(data_date_value, "%Y-%m-%dT%H:%M:%SZ")
-            target_dt_obj = datetime.strptime(month_year, "%b-%Y")
+            target_dt_obj = datetime.strptime(month_folder, "%b_%Y")
             if datetime_object.month != target_dt_obj.month or datetime_object.year != target_dt_obj.year:
                 continue
             summary_div = expense_div.find('div', class_='summary')
@@ -195,8 +195,8 @@ def get_start_month(expense_div):
         month = month_divider_div.find('span').get_text()
         return month
 
-def format_data_from_df(data_frame,file_name):
-    current_folder = main_folder + month_folder + "/"
+def save_splitwise_csv(data_frame,file_name):
+    current_folder = main_folder + month_folder + "/splitwise/"
     output_file_path = current_folder + file_name + '.csv'
     print("output_file_path = ", output_file_path)
     data_frame.to_csv(output_file_path, index=False)
