@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-main_folder = "/Users/kumar/personal_finance/"
+main_folder = os.environ.get('MAIN_FOLDER')
 month_folder = os.environ.get('YEAR_MONTH')
 
 def get_kotak_csv_file_path():

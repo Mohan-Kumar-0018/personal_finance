@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import os
 
-main_folder = "/Users/kumar/personal_finance/"
+main_folder = os.environ.get('MAIN_FOLDER')
 month_folder = os.environ.get('YEAR_MONTH')
 
 
