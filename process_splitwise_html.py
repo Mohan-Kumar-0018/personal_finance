@@ -6,7 +6,6 @@ import os
 main_folder = os.environ.get('MAIN_FOLDER')
 month_folder = os.environ.get('YEAR_MONTH')
 
-
 def get_splitwise_html_file_path():
     current_folder = main_folder + month_folder + "/"
     splitwise_folder = current_folder + "splitwise/"
