@@ -9,8 +9,7 @@ month_folder = os.environ.get('YEAR_MONTH')
 
 def categorize_expenses():
     print("Categorising expenses now ...")
-
-    spliwise_expense_file = "splitwise_expense.csv"
+    
 
 
 def categorize_splitwise_expenses():
@@ -81,5 +80,5 @@ def categorize_kotak_expenses():
 
 
 
-# categorize_splitwise_expenses()
-categorize_kotak_expenses()
+categorize_splitwise_expenses()
+# categorize_kotak_expenses()
