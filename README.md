@@ -10,7 +10,7 @@ Steps:
 Pre-requisite:
 1. Configure MAIN_FOLDER from Makefile in local.
 2. Configure YEAR_MONTH from Makefile in local.
-3. Add OPENAI_API_KEY env variable in makefile. (bash export not working in local. Need to check)
+3. Add OPENAI_API_KEY env variable - either in bash profile or zsh profile
 4. Create month folder under main folder in format - mmm_YYYY (Eg: feb_2024)
 
 Splitise Data extraction:
@@ -29,7 +29,7 @@ Kotak Data Extraction:
 
 Expense cateorization
 1. Run Command `make local` for expense categorization - currenly configured for splitwise
-2. Prompts added in code for now (move to folder - pending
+2. Prompts added in code for now (move to folder - pending)
 3. Categorized Files will be generated inside corresponding folders.
 
 Pending:

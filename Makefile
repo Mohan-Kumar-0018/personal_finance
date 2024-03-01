@@ -1,7 +1,7 @@
 
 YEAR_MONTH = feb_2024
 MAIN_FOLDER = /Users/kumar/personal_finance/
-OPENAI_API_KEY = // Add your OpenAI API key here
+
 export YEAR_MONTH
 export MAIN_FOLDER
 export OPENAI_API_KEY
