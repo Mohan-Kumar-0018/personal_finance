@@ -6,6 +6,9 @@ export YEAR_MONTH
 export MAIN_FOLDER
 export OPENAI_API_KEY
 
+setup:
+	pip install -r requirements.txt
+
 kotak:
 	python3 process_kotak.py
 

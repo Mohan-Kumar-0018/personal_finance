@@ -2,7 +2,9 @@
 
 System Pre-requisite:
     python3
-    Install dependent packages
+
+Setup:
+ - Run command `make setup` for packages installation
 
 Steps:
 Pre-requisite:
@@ -10,7 +12,6 @@ Pre-requisite:
 2. Configure YEAR_MONTH from Makefile in local.
 3. Add OPENAI_API_KEY env variable in makefile. (bash export not working in local. Need to check)
 4. Create month folder under main folder in format - mmm_YYYY (Eg: feb_2024)
-5. Install python packages if needed. (package installation setup pending)
 
 Splitise Data extraction:
 1. Create folders for spliwise under month folder
@@ -32,7 +33,6 @@ Expense cateorization
 3. Categorized Files will be generated inside corresponding folders.
 
 Pending:
-1. Install dependent python packages using requirements.txt
 2. Kotak - Add filter based on YEAR_MONTH
 3. Expense category and sub-category - finalise
 4. Have global prompt and monthly prompt - Read from files - to use in chatgpt
