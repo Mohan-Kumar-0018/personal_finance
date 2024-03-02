@@ -69,6 +69,9 @@ Sub Category - Category
 1. Food - Basic needs
 2. Groceries - Basic needs
 3. Rent - Basic needs
-4. Utiltity payments - Basic needs
+4. Utility payments - Basic needs
 5. Petrol and toll - Travel
-6.  -->
+6. Shopping - Lifestyle
+7. Entertainment - Lifestyle
+8. Drinks - Party
+9. Petty Expenses - Basic needs -->

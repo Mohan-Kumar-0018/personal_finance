@@ -35,7 +35,7 @@ def categorize_splitwise_expenses():
     save_splitwise_csv(df, "expense_data_categorized")
 
 def get_all_categories():
-    return ["Travel", "Food and groceries", "Entertainment and lifestyle", "Basic needs"]
+    return ["Food", "Groceries", "Rent", "Utility payments", "Petrol and toll", "Shopping", "Entertainment", "Drinks","Petty Expenses"]
 
 def classify_expense(title, group_name):
     pre_prompts = pre_requisites_prompts()
@@ -59,23 +59,29 @@ def pre_requisites_prompts():
     rule1 = (f"Here are the keywords for categorization:\n"
               f"- 'movie': Entertainment and Lifestyle\n"
               f"- 'poonkuzhali marriage': Travel\n"
-              f"- 'lunch, dinner,kakatiya ': Food and groceries\n"
+              f"- 'lunch, dinner,kakatiya ': Food \n"
               f"- if not able to categorize, categorize as 'Others'")
 
     return rule1
 
 def get_kotak_prompts():
     category_constrain = (f"Here are the keywords for categorization:\n"
-              f"- 'movie': Entertainment and Lifestyle\n"
-              f"- 'lunch, dinner,kakatiya ': Food and groceries\n")
+            f"- 'movie': Entertainment\n"
+            f"- 'CHANNAHALLI RAJ, DD': Drinks\n"
+            f"- 'Blinkit, Grofers ': Groceries\n"
+            f"- 'WATTAPP TECHNOL': Petrol and toll\n"
+            f"- 'Mygate': Rent\n"
+            f"- 'mohankumaarrr@o': Petty Expenses\n"
+            f"- 'Amazon, Flipkart': Shopping\n"
+            f"- 'lunch, dinner, kakatiya': Food \n")
     is_expense_constrain = (f"Here are rules to determine if given transaction is an expense or not:\n"
              f"- If the description starts with MB: it's a trasfer \n"
              f"- Transfers are usually not an expense\n"
              f"- Rent is paid through transfer, it is an expense\n"
-             f"- Transfer to Nirrop, SMK, Ramya Mom, Jeevrathinam are not expenses\n"
+             f"- Transfer to Niroop, SMK, Ramya, Mom, Jeevarathinam are not expenses\n"
              f"- If not an expense, category needs to be empty string\n"
     )
-    format_constrain = "Note: The output must strictly follow the dict or JSON format: {'category': '{type: string}', 'is_expense': '{type: string}' ." + "category must be a one of the following: 'Travel', 'Food and groceries', 'Entertainment and lifestyle', 'Basic needs' and is_expense must be either 'Yes' or 'No' }"
+    format_constrain = "Note: The output must strictly follow the dict or JSON format: {'category': '{type: string}', 'is_expense': '{type: string}' ." + f"category must be a one of the following: {get_all_categories()} and is_expense must be either 'Yes' or 'No' "
     return category_constrain + is_expense_constrain + format_constrain
 
 def classify_kotak_expense(description):
@@ -88,7 +94,7 @@ def classify_kotak_expense(description):
         model="gpt-3.5-turbo-instruct",
         prompt=prompt,
         temperature=0.3,
-        max_tokens=300
+        max_tokens=400
     )
     print("response = ", response)
     response_text = response.choices[0].text.strip()
@@ -130,7 +136,7 @@ def categorize_kotak_expenses():
 
 def experiment_code():
     print("Experimenting now ...")
-    classify_kotak_expense("UPI/SUN TV NETWORK /440090056305/SUNTVNETWORKLIM")
+    classify_kotak_expense("UPI/mohankumaarrr@o/440295538741/UPI")
     
 def count_tokens(string: str, encoding_name: str) -> int:
     encoding = tiktoken.get_encoding(encoding_name)
