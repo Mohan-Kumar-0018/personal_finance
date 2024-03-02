@@ -1,7 +1,10 @@
+import tiktoken
+import json
 from openai import OpenAI
 from process_splitwise_html import save_splitwise_csv
 from process_kotak import save_kotak_csv
 import pandas as pd
+from unused import num_tokens_from_messages 
 import os
 client = OpenAI()
 main_folder = os.environ.get('MAIN_FOLDER')
@@ -56,7 +59,8 @@ def pre_requisites_prompts():
     rule1 = (f"Here are the keywords for categorization:\n"
               f"- 'movie': Entertainment and Lifestyle\n"
               f"- 'poonkuzhali marriage': Travel\n"
-              f"- 'lunch, dinner,kakatiya ': Food and groceries\n")
+              f"- 'lunch, dinner,kakatiya ': Food and groceries\n"
+              f"- if not able to categorize, categorize as 'Others'")
 
     return rule1
 
@@ -69,17 +73,17 @@ def get_kotak_prompts():
              f"- Transfers are usually not an expense\n"
              f"- Rent is paid through transfer, it is an expense\n"
              f"- Transfer to Nirrop, SMK, Ramya Mom, Jeevrathinam are not expenses\n"
+             f"- If not an expense, category needs to be empty string\n"
     )
-    format_constrain = "Note: The output must strictly follow the dict or JSON format: {'category': '{type: string}', 'is_expense': '{type: string}'"
+    format_constrain = "Note: The output must strictly follow the dict or JSON format: {'category': '{type: string}', 'is_expense': '{type: string}' ." + "category must be a one of the following: 'Travel', 'Food and groceries', 'Entertainment and lifestyle', 'Basic needs' and is_expense must be either 'Yes' or 'No' }"
     return category_constrain + is_expense_constrain + format_constrain
 
 def classify_kotak_expense(description):
     pre_prompts = get_kotak_prompts()
-    # current_prompt =  (f"Based on these keywords, categorize the following expense.\n"
-            #   f"Description: {description}\n"
-            #   f"If not able to categorize, categorize as 'Others'\n")
-    prompt = pre_prompts
+    prompt = pre_prompts + (f"Based on these keywords, categorize the following expense.\n") + f"Description: {description}\n"
     print("prompt = ", prompt)
+    tokens_count = count_tokens(prompt,'cl100k_base')
+    print("tokens_count = ", tokens_count)
     response = client.completions.create(
         model="gpt-3.5-turbo-instruct",
         prompt=prompt,
@@ -87,7 +91,18 @@ def classify_kotak_expense(description):
         max_tokens=300
     )
     print("response = ", response)
-    return response.choices[0].text.strip()
+    response_text = response.choices[0].text.strip()
+    response_text = response_text.replace("'", '"')
+    json_data = json.loads(response_text)
+    print("json_data = ", json_data)
+    category = json_data['category']
+    is_expense = json_data['is_expense']
+    print(f"Category: {category}, Is Expense: {is_expense}")
+    token_used = response.usage.total_tokens
+    print("token_used = ", token_used)
+    
+    # print("completion_tokens = ", completion_tokens, "prompt_tokens = ", prompt_tokens)
+    return category, is_expense, token_used
 
 def categorize_kotak_expenses():
     print("Categorising kotak expenses now ...")
@@ -97,24 +112,31 @@ def categorize_kotak_expenses():
         return
     print("kotak file_path ->", kotak_expenses_file)
     df = pd.read_csv(kotak_expenses_file)
-    df["IS_EXPENSE"] = "Yes"
+    df["IS_EXPENSE"] = ""
     df["GPT_CATEGORY"] = ""
+    df["TOKENS_USED"] = ""
     print("df = ", df)
     for index, row in df.iterrows():
         print("row ----->", row)
-        if index > 10:
-            break
-        category = classify_kotak_expense(row["DESCRIPTION"])
+        category, expense, tokens_used = classify_kotak_expense(row["DESCRIPTION"])
         df.at[index, 'GPT_CATEGORY'] = category
+        df.at[index, 'IS_EXPENSE'] = expense
+        df.at[index, 'TOKENS_USED'] = tokens_used
     
     print("final df = ", df)
+    total_tokens_used = df['TOKENS_USED'].sum()
+    print("total_tokens_used = ", total_tokens_used)
     save_kotak_csv(df, "expense_data_categorized")
 
 def experiment_code():
     print("Experimenting now ...")
+    classify_kotak_expense("UPI/SUN TV NETWORK /440090056305/SUNTVNETWORKLIM")
     
-    
+def count_tokens(string: str, encoding_name: str) -> int:
+    encoding = tiktoken.get_encoding(encoding_name)
+    num_tokens = len(encoding.encode(string))
+    return num_tokens
 
 # experiment_code()
-categorize_splitwise_expenses()
-# categorize_kotak_expenses()
+# categorize_splitwise_expenses()
+categorize_kotak_expenses()
