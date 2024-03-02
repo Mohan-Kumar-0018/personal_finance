@@ -116,5 +116,5 @@ def experiment_code():
     
 
 # experiment_code()
-# categorize_splitwise_expenses()
-categorize_kotak_expenses()
+categorize_splitwise_expenses()
+# categorize_kotak_expenses()
