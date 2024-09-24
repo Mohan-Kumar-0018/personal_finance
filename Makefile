@@ -15,5 +15,8 @@ kotak:
 splitwise:
 	python3 src/process_splitwise_html.py
 
+pluxee:
+	python3 src/process_pluxee.py
+
 local:
 	python3 src/categorize_expenses.py
