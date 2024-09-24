@@ -1,0 +1,23 @@
+
+#Personal finance
+*. Consolidate all transactions
+  1. Kotak Bank - Kumar
+  2. Kotak Bank - Murugan
+  3. PNB Bank - Kumar
+  4. Splitwise
+  5. Cash
+  6. Pluxee
+  7. Loan book
+  8. UPI Lite
+
+*. Get all income
+*. Get all spends
+*. Get all investments
+*. Ignore all transfers
+  1. Between bank accounts
+  2. Partial settlment in splitwise
+*. Note all opening balances
+*. Note all closing balances
+*. Calculate actual spends
+*. Validate against spends - accuracy
+*. Categorize expenses

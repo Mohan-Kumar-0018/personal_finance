@@ -1,2 +1,3 @@
 # Byte-compiled folder
 __pycache__/
+venv/

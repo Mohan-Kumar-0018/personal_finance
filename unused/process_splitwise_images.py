@@ -292,5 +292,3 @@ def process_splitwise_data():
     checking_dev()
 
 process_splitwise_data()
-
-

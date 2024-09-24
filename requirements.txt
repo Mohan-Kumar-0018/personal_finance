@@ -2,3 +2,7 @@ pandas==2.2.0
 beautifulsoup4==4.12.3
 openai==1.13.3
 tiktoken==0.6.0
+gspread==6.1.2
+oauth2client==4.1.3
+
+
