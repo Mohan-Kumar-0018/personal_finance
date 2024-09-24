@@ -18,5 +18,8 @@ splitwise:
 pluxee:
 	python3 src/process_pluxee.py
 
+pnb:
+	python3 src/process_pnb.py
+
 local:
 	python3 src/categorize_expenses.py

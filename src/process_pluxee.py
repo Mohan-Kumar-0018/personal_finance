@@ -19,14 +19,13 @@ def get_pluxee_csv_file_path():
 
 def read_from_pluxee_csv():
     file_path = get_pluxee_csv_file_path()
-    column_mapping = {'Sl. No.': 'S_NO', 'Transaction Date': 'DATE', 'Description': 'DESCRIPTION', 'Chq / Ref No.': 'TRANSACTION_ID', 'Amount': 'AMOUNT', 'Dr / Cr': 'TYPE'}
     # Define column mapping
     column_mapping = {
-        'Date & Time of Balance': 'DATE',
-        'Transaction ID': 'TRANSACTION_ID',
-        'Transaction Details': 'DESCRIPTION',
-        'Credit(in Rs.)': 'CREDIT',
-        'Debit(in Rs.)': 'DEBIT'
+      'Date & Time of Balance': 'DATE',
+      'Transaction ID': 'TRANSACTION_ID',
+      'Transaction Details': 'DESCRIPTION',
+      'Credit(in Rs.)': 'CREDIT',
+      'Debit(in Rs.)': 'DEBIT'
     }
     # Read CSV file
     df = pd.read_csv(file_path)
