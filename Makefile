@@ -23,3 +23,6 @@ pnb:
 
 local:
 	python3 src/categorize_expenses.py
+
+dev:
+	python3 src/money_tracker/process_all_data.py
