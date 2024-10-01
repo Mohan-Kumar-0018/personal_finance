@@ -61,7 +61,4 @@ def read_from_pnb_csv(file,file_path):
     
     # Reset index after all operations
     df = df.reset_index(drop=True)
-
-    print("PNB extracted data --->")
-    print(df)
     return df

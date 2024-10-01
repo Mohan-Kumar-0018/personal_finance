@@ -19,10 +19,8 @@ def read_from_splitwise_html(file,file_path):
     expense_df['ACCOUNT'] = file
     expense_df['ACCOUNT_TYPE'] = 'SHARED_EXPENSE'
     expense_df["REMARKS"] = ""
-    print("expense_df = ")
-    print(expense_df)
     
-    print("TOTAL EXPENSES = ", expense_df['EXPENSE_AMOUNT'].sum())
+    # print("TOTAL EXPENSES = ", expense_df['EXPENSE_AMOUNT'].sum())
     transaction_data = extract_data_from_transaction_boxes(transaction_boxes)
     # Sort the transaction data by date
     transaction_data.sort(key=lambda x: datetime.strptime(x['DATE'], '%d-%m-%Y'))
@@ -30,8 +28,7 @@ def read_from_splitwise_html(file,file_path):
     transaction_df['ACCOUNT'] = file
     transaction_df['ACCOUNT_TYPE'] = 'SHARED_EXPENSE'
     transaction_df["REMARKS"] = ""
-    print("transaction_df = ")
-    print(transaction_df)
+    return expense_df, transaction_df
 
 
 def extract_data_from_expense_boxes(expense_boxes):

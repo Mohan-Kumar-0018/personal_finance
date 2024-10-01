@@ -35,7 +35,4 @@ def read_from_pluxee_csv(file, file_path):
     df['ACCOUNT'] = file
     df['ACCOUNT_TYPE'] = 'BANK'
     df["REMARKS"] = ""
-
-    print("Pluxee extracted data --->")
-    print(df)
     return df

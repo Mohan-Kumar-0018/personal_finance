@@ -11,5 +11,4 @@ def read_from_kotak_csv(file,file_path):
     df['ACCOUNT'] = file
     df['ACCOUNT_TYPE'] = 'BANK'
     df["REMARKS"] = ""
-    print("Kotak extracted data --->")
-    print(df)
+    return df
