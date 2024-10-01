@@ -18,19 +18,20 @@ def process_all_data():
   for file in files_in_folder:
     print(file)
     file_path = source_folder + file
+    file_name = file.split(".")[0]
     match file:
         case _ if file.endswith("kotak.csv"):
             print("processing kotak")
-            read_from_kotak_csv(file_path)
+            read_from_kotak_csv(file_name,file_path)
         case _ if file.endswith("splitwise.html"):
             print("processing splitwise")
-            read_from_splitwise_html(file_path)
+            read_from_splitwise_html(file_name,file_path)
         case _ if file.endswith("pluxee.csv"):
             print("processing pluxee")
-            read_from_pluxee_csv(file_path)
+            read_from_pluxee_csv(file_name,file_path)
         case _ if file.endswith("pnb.csv"):
             print("processing pnb")
-            read_from_pnb_csv(file_path)
+            read_from_pnb_csv(file_name,file_path)
         case _:
             print("unknown file type")
             pass

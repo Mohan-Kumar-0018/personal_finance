@@ -1,6 +1,6 @@
 import pandas as pd
 
-def read_from_pluxee_csv(file_path):
+def read_from_pluxee_csv(file, file_path):
     # Define column mapping
     column_mapping = {
       'Date & Time of Balance': 'DATE',
@@ -27,9 +27,13 @@ def read_from_pluxee_csv(file_path):
     df = df[['S_NO', 'DATE', 'DESCRIPTION', 'TRANSACTION_ID', 'AMOUNT', 'TYPE']]
     # Convert DATE to datetime and format it to DD-MM-YYYY
     
-    df['DATE'] = pd.to_datetime(df['DATE'], format='%d/%m/%Y %H:%M:%S').dt.strftime('%d-%m-%Y')
+    df['DATE'] = pd.to_datetime(df['DATE'], format='%d/%m/%Y %H:%M:%S')
+    df = df.sort_values('DATE')
+    df['DATE'] = df['DATE'].dt.strftime('%d-%m-%Y')
     df['AMOUNT'] = df['AMOUNT'].astype(float)
-    # Add REMARKS column
+    
+    df['ACCOUNT'] = file
+    df['ACCOUNT_TYPE'] = 'BANK'
     df["REMARKS"] = ""
 
     print("Pluxee extracted data --->")

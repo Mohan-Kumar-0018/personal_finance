@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def read_from_pnb_csv(file_path):
+def read_from_pnb_csv(file,file_path):
     # Read the CSV file into a pandas DataFrame
     df = pd.read_csv(file_path)
     
@@ -51,9 +51,12 @@ def read_from_pnb_csv(file_path):
     df = df[['S_NO', 'DATE', 'DESCRIPTION', 'AMOUNT', 'TYPE']]
     
     # Convert DATE to datetime and format it to DD-MM-YYYY
-    df['DATE'] = pd.to_datetime(df['DATE'], format='%d/%m/%Y').dt.strftime('%d-%m-%Y')
+    df['DATE'] = pd.to_datetime(df['DATE'], format='%d/%m/%Y')
+    df = df.sort_values('DATE')
+    df['DATE'] = df['DATE'].dt.strftime('%d-%m-%Y')
     
-    # Add REMARKS column
+    df['ACCOUNT'] = file
+    df['ACCOUNT_TYPE'] = 'BANK'
     df["REMARKS"] = ""
     
     # Reset index after all operations

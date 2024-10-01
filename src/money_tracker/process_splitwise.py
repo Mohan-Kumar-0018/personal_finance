@@ -7,19 +7,29 @@ main_folder = os.environ.get('MAIN_FOLDER')
 month_folder = os.environ.get('YEAR_MONTH')
 
 
-def read_from_splitwise_html(file_path):
+def read_from_splitwise_html(file,file_path):
     expense_boxes, transaction_boxes, errors = extract_valid_expense_and_transaction_boxes(file_path)
     print("expense_boxes length= ", len(expense_boxes))
     print("transaction_boxes length= ", len(transaction_boxes))
     print("errors length= ", len(errors))
     expense_data = extract_data_from_expense_boxes(expense_boxes)
+    # Sort the expense data by date
+    expense_data.sort(key=lambda x: datetime.strptime(x['DATE'], '%d-%m-%Y'))
     expense_df = pd.DataFrame(expense_data)
+    expense_df['ACCOUNT'] = file
+    expense_df['ACCOUNT_TYPE'] = 'SHARED_EXPENSE'
+    expense_df["REMARKS"] = ""
     print("expense_df = ")
     print(expense_df)
     
     print("TOTAL EXPENSES = ", expense_df['EXPENSE_AMOUNT'].sum())
     transaction_data = extract_data_from_transaction_boxes(transaction_boxes)
+    # Sort the transaction data by date
+    transaction_data.sort(key=lambda x: datetime.strptime(x['DATE'], '%d-%m-%Y'))
     transaction_df = pd.DataFrame(transaction_data)
+    transaction_df['ACCOUNT'] = file
+    transaction_df['ACCOUNT_TYPE'] = 'SHARED_EXPENSE'
+    transaction_df["REMARKS"] = ""
     print("transaction_df = ")
     print(transaction_df)
 
@@ -73,7 +83,7 @@ def extract_data_from_expense_boxes(expense_boxes):
         else:
             print("No you div found.")    
         data.append({
-            'TRANSACTION_DATE': formatted_date,
+            'DATE': formatted_date,
             'TITLE': title,
             'GROUP_NAME': group_name,
             'PAID_BY': paid_by,
@@ -121,7 +131,7 @@ def extract_data_from_transaction_boxes(transaction_boxes):
         else:
             print("No you div found.")
         data.append({
-            'TRANSACTION_DATE': formatted_date,
+            'DATE': formatted_date,
             'TRANSACTION_TYPE': transaction_type,
             'PAID_BY': paid_by,
             'GROUP_NAME': group_name,
