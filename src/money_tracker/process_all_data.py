@@ -5,7 +5,7 @@ from process_kotak import read_from_kotak_csv
 from process_pluxee import read_from_pluxee_csv
 from process_pnb import read_from_pnb_csv
 from process_splitwise import read_from_splitwise_html
-from analyse_transfers import mark_bank_transfers, mark_splitwise_transfers
+from analyse_transfers import mark_bank_transfers, mark_splitwise_transfers, mark_pnb_transfers
 main_folder = os.environ.get('MAIN_FOLDER')
 month_folder = os.environ.get('YEAR_MONTH')
 current_folder = main_folder + month_folder + "/"
@@ -14,8 +14,10 @@ current_folder = main_folder + month_folder + "/"
 def process_all_data():
 	banks_df, splitwise_expense_df, splitwise_transaction_df, pluxee_df = read_all_data()
 	banks_df, matching_transactions = mark_bank_transfers(banks_df)
+	banks_df = mark_pnb_transfers(banks_df)
 	banks_df, splitwise_transaction_df = mark_splitwise_transfers(banks_df, splitwise_transaction_df)
 	transfers_df = banks_df[banks_df['IS_TRANSFER'] == 'YES']
+	transfers_df = transfers_df.sort_values(by=['DATE', 'AMOUNT','TRANSACTION_ID'])
 	save_result(banks_df, 'banks')
 	save_result(matching_transactions, 'matching_transactions')
 	save_result(splitwise_expense_df, 'splitwise_expenses')
