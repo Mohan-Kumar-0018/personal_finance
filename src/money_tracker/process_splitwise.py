@@ -25,6 +25,7 @@ def read_from_splitwise_html(file,file_path):
     # Sort the transaction data by date
     transaction_data.sort(key=lambda x: datetime.strptime(x['DATE'], '%d-%m-%Y'))
     transaction_df = pd.DataFrame(transaction_data)
+    transaction_df.insert(0, 'S_NO', range(1, len(transaction_df) + 1))
     transaction_df['ACCOUNT'] = file
     transaction_df['ACCOUNT_TYPE'] = 'SHARED_EXPENSE'
     transaction_df["REMARKS"] = ""
@@ -129,10 +130,10 @@ def extract_data_from_transaction_boxes(transaction_boxes):
             print("No you div found.")
         data.append({
             'DATE': formatted_date,
-            'TRANSACTION_TYPE': transaction_type,
+            'TYPE': transaction_type,
             'PAID_BY': paid_by,
             'GROUP_NAME': group_name,
-            'TOTAL_AMOUNT': total_amount,
+            'AMOUNT': total_amount,
         })
     return data
     
