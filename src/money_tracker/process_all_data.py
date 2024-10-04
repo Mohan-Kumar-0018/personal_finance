@@ -6,6 +6,7 @@ from process_pluxee import read_from_pluxee_csv
 from process_pnb import read_from_pnb_csv
 from process_splitwise import read_from_splitwise_html
 from analyse_transfers import mark_bank_transfers, mark_splitwise_transfers, mark_pnb_transfers, mark_splitwise_expenses
+from classify_transactions import classify_credit_transactions, classify_debit_transactions
 main_folder = os.environ.get('MAIN_FOLDER')
 month_folder = os.environ.get('YEAR_MONTH')
 current_folder = main_folder + month_folder + "/"
@@ -19,7 +20,13 @@ def process_all_data():
 	banks_df, splitwise_expense_df = mark_splitwise_expenses(banks_df, splitwise_expense_df)
 	transfers_df = banks_df[banks_df['IS_TRANSFER'] == 'YES']
 	transfers_df = transfers_df.sort_values(by=['DATE', 'AMOUNT','TRANSACTION_ID'])
+	banks_credits = banks_df[(banks_df['IS_TRANSFER'] != 'YES') & (banks_df['TYPE'] == 'CREDIT')]
+	banks_debits = banks_df[(banks_df['IS_TRANSFER'] != 'YES') & (banks_df['TYPE'] == 'DEBIT')]
+	banks_credits = classify_credit_transactions(banks_credits)
+	banks_debits = classify_debit_transactions(banks_debits)
 	save_result(banks_df, 'banks')
+	save_result(banks_credits, 'banks_credits')
+	save_result(banks_debits, 'banks_debits')
 	save_result(splitwise_transaction_df, 'splitwise_transactions')
 	save_result(splitwise_expense_df, 'splitwise_expenses')
 	save_result(pluxee_df, 'pluxee')
