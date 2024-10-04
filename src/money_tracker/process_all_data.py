@@ -13,7 +13,7 @@ current_folder = main_folder + month_folder + "/"
 
 
 def process_all_data():
-	banks_df, splitwise_expense_df, splitwise_transaction_df, pluxee_df = read_all_data()
+	banks_df, splitwise_expense_df, splitwise_transaction_df = read_all_data()
 	banks_df= mark_bank_transfers(banks_df)
 	banks_df = mark_pnb_transfers(banks_df)
 	banks_df, splitwise_transaction_df = mark_splitwise_transfers(banks_df, splitwise_transaction_df)
@@ -24,12 +24,15 @@ def process_all_data():
 	banks_debits = banks_df[(banks_df['IS_TRANSFER'] != 'YES') & (banks_df['TYPE'] == 'DEBIT')]
 	banks_credits = classify_credit_transactions(banks_credits)
 	banks_debits = classify_debit_transactions(banks_debits)
+	pending_credits = banks_credits[(banks_credits['IS_INCOME'] == '')]
+	pending_debits = banks_debits[(banks_debits['IS_INVESTMENT'] == '') & (banks_debits['IS_EXPENSE'] == '')]
 	save_result(banks_df, 'banks')
 	save_result(banks_credits, 'banks_credits')
 	save_result(banks_debits, 'banks_debits')
+	save_result(pending_credits, 'pending_credits')
+	save_result(pending_debits, 'pending_debits')
 	save_result(splitwise_transaction_df, 'splitwise_transactions')
 	save_result(splitwise_expense_df, 'splitwise_expenses')
-	save_result(pluxee_df, 'pluxee')
 	save_result(transfers_df, 'transfers')
    
 def save_result(df, file_name):
@@ -40,7 +43,7 @@ def save_result(df, file_name):
 def read_all_data():
 	source_folder = current_folder + "source/"
 	files_in_folder = os.listdir(source_folder)
-	banks_df, splitwise_expense_df, splitwise_transaction_df, pluxee_df = pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+	banks_df, splitwise_expense_df, splitwise_transaction_df = pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
 	for file in files_in_folder:
 		print(file)
 		file_path = source_folder + file
@@ -56,13 +59,13 @@ def read_all_data():
 				splitwise_transaction_df = pd.concat([splitwise_transaction_df, transaction_df], ignore_index=True)
 			case _ if file.endswith("pluxee.csv"):
 				print("processing pluxee")
-				pluxee_df = pd.concat([pluxee_df, read_from_pluxee_csv(file_name, file_path)], ignore_index=True)
+				banks_df = pd.concat([banks_df, read_from_pluxee_csv(file_name, file_path)], ignore_index=True)
 			case _ if file.endswith("pnb.csv"):
 				print("processing pnb")
 				banks_df = pd.concat([banks_df, read_from_pnb_csv(file_name, file_path)], ignore_index=True)
 			case _:
 				print("unknown file type")
 				pass
-	return banks_df, splitwise_expense_df, splitwise_transaction_df, pluxee_df
+	return banks_df, splitwise_expense_df, splitwise_transaction_df
 
 process_all_data()

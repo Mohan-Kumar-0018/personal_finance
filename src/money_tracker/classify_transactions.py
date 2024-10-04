@@ -19,6 +19,10 @@ def classify_debit_transactions(banks_debits_df):
       banks_debits_df.at[index, 'IS_INVESTMENT'] = 'YES'
       continue
 
+    if is_expense(row):
+      banks_debits_df.at[index, 'IS_EXPENSE'] = 'YES'
+      continue
+
   return banks_debits_df
 
 def is_income(row):
@@ -40,6 +44,11 @@ def is_income(row):
   pnb_interest_pattern = r"^(\d+):Int\.Pd:(\d{2}-\d{2}-\d{4}) to (\d{2}-\d{2}-\d{4})$"
   if re.match(pnb_interest_pattern, str(row['DESCRIPTION'])) and (pd.isna(row['TRANSACTION_ID']) or row['TRANSACTION_ID'] == '') and 'PNB'.lower() in str(row['ACCOUNT']).lower():
     return True
+  
+  # Pluxee Income
+  pluxee_income_pattern = r".*SHOPUP INDIA TECHNOLOGIES.*"
+  if re.match(pluxee_income_pattern, str(row['DESCRIPTION'])) and 'PLUXEE'.lower() in str(row['ACCOUNT']).lower():
+    return True
 
   return False
 
@@ -60,5 +69,48 @@ def is_investment(row):
     zerodha_pattern = r".*Zerodha Broking.*"
     if re.match(zerodha_pattern, str(row['DESCRIPTION'])):
       return True
+
+  return False
+
+def is_expense(row):
+  # Pluxee Spends
+  # Instamart
+  instamart_pattern = r".*SWIGGY INSTAMART.*"
+  if re.match(instamart_pattern, str(row['DESCRIPTION'])) and 'PLUXEE'.lower() in str(row['ACCOUNT']).lower():
+    return True
+  
+  # Swiggy
+  swiggy_pattern = r".*SWIGGY.*"
+  if re.match(swiggy_pattern, str(row['DESCRIPTION'])) and 'PLUXEE'.lower() in str(row['ACCOUNT']).lower():
+    return True
+  
+  # UPI Lite Spends
+  upi_lite_spends_pattern = r"^UPI/.*mohankumaarrr@o.*"
+  if re.match(upi_lite_spends_pattern, str(row['DESCRIPTION'])):
+    return True
+  
+  # UPI Zomato
+  zomato_pattern = r"^UPI/.*ZOMATO LIMITED.*"
+  if re.match(zomato_pattern, str(row['DESCRIPTION'])):
+    return True
+  
+  # UPI BlinkIt
+  blinkit_pattern = r"^UPI/.*BLINKIT.*"
+  if re.match(blinkit_pattern, str(row['DESCRIPTION'])):
+    return True
+  
+  # UPI Swiggy
+  swiggy_pattern = r"^UPI/.*SWIGGY.*"
+  if re.match(swiggy_pattern, str(row['DESCRIPTION'])):
+    return True
+  
+  swiggy_pattern2 = r"^UPI/.*Swiggy Limited.*"
+  if re.match(swiggy_pattern2, str(row['DESCRIPTION'])):
+    return True
+  
+  swiggy_pattern3 = r"^UPI/.*Swiggy.*"
+  if re.match(swiggy_pattern3, str(row['DESCRIPTION'])):
+    return True
+
 
   return False
