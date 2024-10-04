@@ -73,44 +73,24 @@ def is_investment(row):
   return False
 
 def is_expense(row):
-  # Pluxee Spends
-  # Instamart
-  instamart_pattern = r".*SWIGGY INSTAMART.*"
-  if re.match(instamart_pattern, str(row['DESCRIPTION'])) and 'PLUXEE'.lower() in str(row['ACCOUNT']).lower():
-    return True
-  
-  # Swiggy
-  swiggy_pattern = r".*SWIGGY.*"
-  if re.match(swiggy_pattern, str(row['DESCRIPTION'])) and 'PLUXEE'.lower() in str(row['ACCOUNT']).lower():
-    return True
-  
-  # UPI Lite Spends
-  upi_lite_spends_pattern = r"^UPI/.*mohankumaarrr@o.*"
-  if re.match(upi_lite_spends_pattern, str(row['DESCRIPTION'])):
-    return True
-  
-  # UPI Zomato
-  zomato_pattern = r"^UPI/.*ZOMATO LIMITED.*"
-  if re.match(zomato_pattern, str(row['DESCRIPTION'])):
-    return True
-  
-  # UPI BlinkIt
-  blinkit_pattern = r"^UPI/.*BLINKIT.*"
-  if re.match(blinkit_pattern, str(row['DESCRIPTION'])):
-    return True
-  
-  # UPI Swiggy
-  swiggy_pattern = r"^UPI/.*SWIGGY.*"
-  if re.match(swiggy_pattern, str(row['DESCRIPTION'])):
-    return True
-  
-  swiggy_pattern2 = r"^UPI/.*Swiggy Limited.*"
-  if re.match(swiggy_pattern2, str(row['DESCRIPTION'])):
-    return True
-  
-  swiggy_pattern3 = r"^UPI/.*Swiggy.*"
-  if re.match(swiggy_pattern3, str(row['DESCRIPTION'])):
-    return True
-
+  expense_patterns = [
+    r".*SWIGGY INSTAMART.*",        # Pluxee Spends
+    r".*SWIGGY.*",                  # Swiggy
+    r"^UPI/.*mohankumaarrr@o.*",    # UPI Lite Spends
+    r"^UPI/.*Zomato.*",             # UPI Zomato
+    r"^UPI/.*BlinkIt.*",            # UPI BlinkIt
+    r"^UPI/.*Swiggy.*",             # UPI Swiggy
+    r"^UPI/.*Amazon.*",             # UPI Amazon
+    r"^UPI/.*Meesho.*",             # UPI Meesho
+    r"^UPI/.*Airtel.*",             # UPI Airtel
+    r"^UPI/.*BigBasket.*",          # UPI BigBasket
+    r"^UPI/.*BBDaily.*",            # UPI BBDaily
+    r"^UPI/.*YouTube.*",            # UPI YouTube
+    r"^UPI/.*Google Play.*",        # UPI Google Play
+  ]  
+  for pattern in expense_patterns:
+    if re.match(pattern, str(row['DESCRIPTION']), re.IGNORECASE):
+      if 'PLUXEE'.lower() in str(row['ACCOUNT']).lower() or 'UPI' in pattern:
+        return True
 
   return False
