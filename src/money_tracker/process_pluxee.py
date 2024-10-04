@@ -13,8 +13,6 @@ def read_from_pluxee_csv(file, file_path):
     df = pd.read_csv(file_path)
     # Select and rename columns
     df = df[column_mapping.keys()].rename(columns=column_mapping)
-    # Add S_NO column
-    df.insert(0, 'S_NO', range(1, len(df) + 1))
     # Convert CREDIT and DEBIT columns to float, handling potential string values
     df['CREDIT'] = df['CREDIT'].apply(lambda x: float(x.replace(',', '')) if isinstance(x, str) else x)
     df['DEBIT'] = df['DEBIT'].apply(lambda x: float(x.replace(',', '')) if isinstance(x, str) else x)
@@ -23,15 +21,16 @@ def read_from_pluxee_csv(file, file_path):
     df['AMOUNT'] = df.apply(lambda row: row['CREDIT'] if row['TYPE'] == 'CREDIT' else row['DEBIT'], axis=1)
     # Drop unnecessary columns
     df = df.drop(['CREDIT', 'DEBIT'], axis=1)
-    # Reorder columns
-    df = df[['S_NO', 'DATE', 'DESCRIPTION', 'TRANSACTION_ID', 'AMOUNT', 'TYPE']]
     # Convert DATE to datetime and format it to DD-MM-YYYY
     
     df['DATE'] = pd.to_datetime(df['DATE'], format='%d/%m/%Y %H:%M:%S')
     df = df.sort_values('DATE')
     df['DATE'] = df['DATE'].dt.strftime('%d-%m-%Y')
     df['AMOUNT'] = df['AMOUNT'].astype(float)
-    
+    # Add S_NO column
+    df.insert(0, 'S_NO', range(1, len(df) + 1))
+    # Reorder columns
+    df = df[['S_NO', 'DATE', 'DESCRIPTION', 'TRANSACTION_ID', 'AMOUNT', 'TYPE']]
     df['ACCOUNT'] = file
     df['ACCOUNT_TYPE'] = 'BANK'
     df["REMARKS"] = ""

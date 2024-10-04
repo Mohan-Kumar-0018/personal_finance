@@ -33,9 +33,6 @@ def read_from_pnb_csv(file,file_path):
     # Remove rows where DATE column is empty
     df = df.dropna(subset=['DATE'])
     
-    # Add S_NO column
-    df.insert(0, 'S_NO', range(1, len(df) + 1))
-    
     # Convert CREDIT and DEBIT columns to float, handling potential string values
     df['CREDIT'] = df['CREDIT'].apply(lambda x: float(x.replace(',', '')) if isinstance(x, str) and x.strip() else 0)
     df['DEBIT'] = df['DEBIT'].apply(lambda x: float(x.replace(',', '')) if isinstance(x, str) and x.strip() else 0)
@@ -46,18 +43,18 @@ def read_from_pnb_csv(file,file_path):
     
     # Drop unnecessary columns
     df = df.drop(['CREDIT', 'DEBIT'], axis=1)
-    
-    # Reorder columns
-    df = df[['S_NO', 'DATE', 'DESCRIPTION', 'AMOUNT', 'TYPE']]
-    
     # Convert DATE to datetime and format it to DD-MM-YYYY
     df['DATE'] = pd.to_datetime(df['DATE'], format='%d/%m/%Y')
     df = df.sort_values('DATE')
     df['DATE'] = df['DATE'].dt.strftime('%d-%m-%Y')
-    
+    # Add S_NO column
+    df.insert(0, 'S_NO', range(1, len(df) + 1))
+    # Reorder columns
+    df = df[['S_NO', 'DATE', 'DESCRIPTION', 'AMOUNT', 'TYPE']]
     df['ACCOUNT'] = file
     df['ACCOUNT_TYPE'] = 'BANK'
     df["REMARKS"] = ""
+    df["IS_TRANSFER"] = ""
     
     # Reset index after all operations
     df = df.reset_index(drop=True)
