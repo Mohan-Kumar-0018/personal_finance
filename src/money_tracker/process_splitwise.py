@@ -16,6 +16,7 @@ def read_from_splitwise_html(file,file_path):
     # Sort the expense data by date
     expense_data.sort(key=lambda x: datetime.strptime(x['DATE'], '%d-%m-%Y'))
     expense_df = pd.DataFrame(expense_data)
+    expense_df.insert(0, 'S_NO', range(1, len(expense_df) + 1))
     expense_df['ACCOUNT'] = file
     expense_df['ACCOUNT_TYPE'] = 'SHARED_EXPENSE'
     expense_df["REMARKS"] = ""

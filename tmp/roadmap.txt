@@ -21,3 +21,11 @@
 *. Calculate actual spends
 *. Validate against spends - accuracy
 *. Categorize expenses
+
+
+
+Reconciliation:
+System: 
+* Pending splitwise transactions
+Manual:
+* Mapped transfers
