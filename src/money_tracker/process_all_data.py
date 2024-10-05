@@ -68,6 +68,9 @@ def read_all_data():
 			case _ if file.endswith("cash.csv"):
 				print("processing cash")
 				banks_df = pd.concat([banks_df, read_from_cash_csv(file_name, file_path)], ignore_index=True)
+			case _ if file.endswith("loan.csv"):
+				print("processing loan")
+				banks_df = pd.concat([banks_df, read_from_cash_csv(file_name, file_path)], ignore_index=True)
 			case _:
 				print("unknown file type")
 				pass
