@@ -13,5 +13,4 @@ def read_from_cash_csv(file,file_path):
     df['ACCOUNT_TYPE'] = 'BANK'
     df["REMARKS"] = ""
     df["IS_TRANSFER"] = ""
-    print("cash df = ", df)
     return df

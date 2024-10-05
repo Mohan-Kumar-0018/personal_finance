@@ -6,7 +6,7 @@ from process_pluxee import read_from_pluxee_csv
 from process_cash import read_from_cash_csv
 from process_pnb import read_from_pnb_csv
 from process_splitwise import read_from_splitwise_html
-from analyse_transfers import mark_bank_transfers, mark_splitwise_transfers, mark_pnb_transfers, mark_splitwise_expenses
+from analyse_transfers import mark_bank_transfers, mark_splitwise_transfers, mark_pnb_transfers, mark_splitwise_expenses, mark_cash_transfers
 from classify_transactions import classify_credit_transactions, classify_debit_transactions
 main_folder = os.environ.get('MAIN_FOLDER')
 month_folder = os.environ.get('YEAR_MONTH')
@@ -17,6 +17,7 @@ def process_all_data():
 	banks_df, splitwise_expense_df, splitwise_transaction_df = read_all_data()
 	banks_df= mark_bank_transfers(banks_df)
 	banks_df = mark_pnb_transfers(banks_df)
+	banks_df = mark_cash_transfers(banks_df)
 	banks_df, splitwise_transaction_df = mark_splitwise_transfers(banks_df, splitwise_transaction_df)
 	banks_df, splitwise_expense_df = mark_splitwise_expenses(banks_df, splitwise_expense_df)
 	transfers_df = banks_df[banks_df['IS_TRANSFER'] == 'YES']
