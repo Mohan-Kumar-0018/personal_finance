@@ -3,6 +3,7 @@ import re
 import pandas as pd
 from process_kotak import read_from_kotak_csv
 from process_pluxee import read_from_pluxee_csv
+from process_cash import read_from_cash_csv
 from process_pnb import read_from_pnb_csv
 from process_splitwise import read_from_splitwise_html
 from analyse_transfers import mark_bank_transfers, mark_splitwise_transfers, mark_pnb_transfers, mark_splitwise_expenses
@@ -63,6 +64,9 @@ def read_all_data():
 			case _ if file.endswith("pnb.csv"):
 				print("processing pnb")
 				banks_df = pd.concat([banks_df, read_from_pnb_csv(file_name, file_path)], ignore_index=True)
+			case _ if file.endswith("cash.csv"):
+				print("processing cash")
+				banks_df = pd.concat([banks_df, read_from_cash_csv(file_name, file_path)], ignore_index=True)
 			case _:
 				print("unknown file type")
 				pass
